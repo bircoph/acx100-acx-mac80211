@@ -8,5 +8,6 @@
 *.patch
 *.swp
 *~
+.tmp_versions
 Module.symvers
 modules.order
