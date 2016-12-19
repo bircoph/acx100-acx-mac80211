@@ -1070,7 +1070,7 @@ int acx_op_hw_scan(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 #if CONFIG_ACX_MAC80211_VERSION < KERNEL_VERSION(3, 16, 0)
                    struct cfg80211_scan_request *req)
 #else
-                   struct ieee80211_scan_request *req)
+                   struct ieee80211_scan_request *ieee80211_req)
 #endif
 {
 	acx_device_t *adev = hw2adev(hw);
@@ -1079,6 +1079,9 @@ int acx_op_hw_scan(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 	u8 *ssid = NULL;
 	int ret=0;
 
+#if CONFIG_ACX_MAC80211_VERSION >= KERNEL_VERSION(3, 16, 0)
+    struct cfg80211_scan_request *req = &(ieee80211_req->req);
+#endif
 	if (req->n_ssids) {
 		ssid = req->ssids[0].ssid;
 		ssid_len = req->ssids[0].ssid_len;
