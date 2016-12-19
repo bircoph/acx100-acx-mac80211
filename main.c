@@ -497,7 +497,13 @@ int acx_free_mechanics(acx_device_t *adev)
 
 int acx_init_ieee80211(acx_device_t *adev, struct ieee80211_hw *hw)
 {
+#if CONFIG_ACX_MAC80211_VERSION < KERNEL_VERSION(4, 2, 0)
 	hw->flags &= ~IEEE80211_HW_RX_INCLUDES_FCS;
+#else
+	// clear bit, is this really needed?
+	// see kernel commit 30686bf7f5b3c30831761e188a6e3cb33580fa48
+	__clear_bit(IEEE80211_HW_RX_INCLUDES_FCS, hw->flags);
+#endif
 	hw->queues = 1;
 	hw->wiphy->max_scan_ssids = 1;
 
@@ -525,7 +531,11 @@ int acx_init_ieee80211(acx_device_t *adev, struct ieee80211_hw *hw)
 	/* We base signal quality on winlevel approach of previous driver
 	 * TODO OW 20100615 This should into a common init code
 	 */
+#if CONFIG_ACX_MAC80211_VERSION < KERNEL_VERSION(4, 2, 0)
 	hw->flags |= IEEE80211_HW_SIGNAL_UNSPEC;
+#else
+	ieee80211_hw_set(hw, SIGNAL_UNSPEC);
+#endif
 	hw->max_signal = 100;
 
 	if (IS_ACX100(adev)) {
@@ -945,7 +955,11 @@ void acx_op_configure_filter(struct ieee80211_hw *hw,
 		changed_flags, *total_flags);
 
 	/* OWI TODO: Set also FIF_PROBE_REQ ? */
+#if CONFIG_ACX_MAC80211_VERSION < KERNEL_VERSION(4, 2, 0)
 	*total_flags &= (FIF_PROMISC_IN_BSS | FIF_ALLMULTI | FIF_FCSFAIL
+#else
+	*total_flags &= (FIF_ALLMULTI | FIF_FCSFAIL
+#endif
 			| FIF_CONTROL | FIF_OTHER_BSS);
 
 	logf1(L_DEBUG, "2: *total_flags=0x%08x\n", *total_flags);
