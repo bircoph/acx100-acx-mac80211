@@ -593,7 +593,7 @@ int acx1xx_update_antenna(acx_device_t *adev)
 
 	log(L_INIT, "Updating antenna[0,1]: 0x%02X 0x%02X\n",
 		adev->antenna[0], adev->antenna[1]);
-	memset(antenna, 0, sizeof(antenna));
+	memset(antenna, 0, sizeof(*antenna));
 	antenna[4] = adev->antenna[0];
 	antenna[5] = adev->antenna[1];
 	res = acx_configure(adev, antenna,
