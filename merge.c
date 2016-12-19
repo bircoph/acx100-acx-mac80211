@@ -2678,8 +2678,8 @@ void acx_irq_work(struct work_struct *work)
 	int i;
 #if CONFIG_ACX_MAC80211_VERSION >= KERNEL_VERSION(4, 7, 0)
 	struct cfg80211_scan_info info = {
-		.aborted = false;
-	}
+		.aborted = false
+	};
 #endif
 
 
@@ -3148,8 +3148,8 @@ void acx_stop(acx_device_t *adev)
 {
 #if CONFIG_ACX_MAC80211_VERSION >= KERNEL_VERSION(4, 7, 0)
 	struct cfg80211_scan_info info = {
-		.aborted = true;
-	}
+		.aborted = true
+	};
 #endif
 	acxmem_lock_flags;
 
