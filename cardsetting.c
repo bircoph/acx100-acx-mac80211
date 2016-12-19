@@ -159,7 +159,11 @@ int acx_set_channel(acx_device_t *adev, u8 channel, int freq)
 	int res = 0;
 
 	adev->rx_status.freq = freq;
+#if CONFIG_ACX_MAC80211_VERSION < KERNEL_VERSION(3, 6, 0)
 	adev->rx_status.band = IEEE80211_BAND_2GHZ;
+#else
+	adev->rx_status.band = IEEE80211_BANDID_2G;
+#endif
 
 	adev->channel = channel;
 
