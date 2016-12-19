@@ -1111,7 +1111,11 @@ int acx_op_hw_scan(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 		goto out;
 	}
 #else
+#if CONFIG_ACX_MAC80211_VERSION < KERNEL_VERSION(3, 18, 0)
 	skb = ieee80211_probereq_get(adev->hw, adev->vif, ssid, ssid_len,
+#else
+	skb = ieee80211_probereq_get(adev->hw, adev->vif->addr, ssid, ssid_len,
+#endif
 		req->ie_len);
 	if (!skb) {
 		ret = -ENOMEM;
