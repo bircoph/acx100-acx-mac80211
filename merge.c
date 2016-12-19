@@ -2676,7 +2676,11 @@ void acx_irq_work(struct work_struct *work)
 	acxmem_lock_flags;
 	unsigned int irqcnt = 0; // but always do-while once, see IRQ_ITERATE
 	int i;
-
+#if CONFIG_ACX_MAC80211_VERSION >= KERNEL_VERSION(4, 7, 0)
+	struct cfg80211_scan_info info = {
+		.aborted = false;
+	}
+#endif
 
 
 	acx_sem_lock(adev);
@@ -2776,7 +2780,11 @@ void acx_irq_work(struct work_struct *work)
 		/* HOST_INT_SCAN_COMPLETE */
 		if (irqmasked & HOST_INT_SCAN_COMPLETE) {
 			if (test_bit(ACX_FLAG_SCANNING, &adev->flags)) {
+#if CONFIG_ACX_MAC80211_VERSION < KERNEL_VERSION(4, 7, 0)
 				ieee80211_scan_completed(adev->hw, false);
+#else
+				ieee80211_scan_completed(adev->hw, &info);
+#endif
 				log(L_INIT, "scan completed\n");
 				clear_bit(ACX_FLAG_SCANNING, &adev->flags);
 			}
@@ -3138,10 +3146,19 @@ int acx_op_start(struct ieee80211_hw *hw)
 
 void acx_stop(acx_device_t *adev)
 {
+#if CONFIG_ACX_MAC80211_VERSION >= KERNEL_VERSION(4, 7, 0)
+	struct cfg80211_scan_info info = {
+		.aborted = true;
+	}
+#endif
 	acxmem_lock_flags;
 
 	if (test_bit(ACX_FLAG_SCANNING, &adev->flags)) {
+#if CONFIG_ACX_MAC80211_VERSION < KERNEL_VERSION(4, 7, 0)
 		ieee80211_scan_completed(adev->hw, true);
+#else
+		ieee80211_scan_completed(adev->hw, &info);
+#endif
 		acx_issue_cmd(adev, ACX1xx_CMD_STOP_SCAN, NULL, 0);
 		clear_bit(ACX_FLAG_SCANNING, &adev->flags);
 	}
